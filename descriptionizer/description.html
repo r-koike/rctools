@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Description</title>
+  <style>
+    .contents-font {
+      font-size: 5vw;
+    }
+
+    header div {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    td {
+      position: relative;
+    }
+
+    td input {
+      width: 45%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div id="clock" style="width: 85vw; font-size: 8vw;"></div>
+    <div id="start-button" style="width: 10vw; height: 10vw; background-color: brown;">Button</div>
+  </header>
+  <table class="contents-font" border="0" style="width: 100%; ">
+    <!-- <table class="contents-font" border="1" style="width: 100%; border-collapse: collapse;"> -->
+    <tr>
+      <td id="date" colspan="2"></td>
+    </tr>
+    <tr>
+      <td>Team: SHINOBI</td>
+      <td>Robot: FUHGA 3</td>
+    </tr>
+    <tr>
+      <td>Config: <input class="contents-font" value="AAA"></input></td>
+      <td>Operator: <input class="contents-font" value="Takemori"></input></td>
+    </tr>
+    <tr>
+      <td colspan="2">Test: <input class="contents-font"></input></td>
+    </tr>
+    <tr>
+      <td>Trial: <input class="contents-font" value="1"></input></td>
+      <td>Position: <input class="contents-font"></input></td>
+    </tr>
+  </table>
+  <script>
+    let audio = new Audio("1000Hz.wav");
+
+    document.getElementById("start-button").onclick = function () {
+      // document.getElementById("start-button").innerHTML = "Clicked";
+      audio.play();
+      window.setTimeout(stopAudio, 1000);
+    };
+    function stopAudio() {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+    function setCurrentTime() {
+      let date = new Date();
+      let dates = date.toString().split(" ");
+      document.getElementById("date").innerHTML = `Date: ${dates[0]} ${dates[1]} ${dates[2]} ${dates[3]} (${dates[5]})`;
+      document.getElementById("clock").innerHTML = `${dates[4]}`;
+    };
+    setInterval(setCurrentTime, 50);
+  </script>
+</body>
+
+</html>
