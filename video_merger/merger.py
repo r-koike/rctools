@@ -24,7 +24,7 @@ SAME_TEST_MERGIN = 15.0
 OVERRIDE_OUTPUT_VIDEO = OverrideConfig.override
 
 
-video_dirname = os.path.join(os.path.dirname(__file__), "origin")
+video_dirname = os.path.join(os.path.dirname(__file__), "test")
 output_dirname = os.path.join(os.path.dirname(__file__), "output")
 analyzed_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
 manual_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_start_times.json")
@@ -49,13 +49,13 @@ def sort_video_basenames(v0, v1, v2, v3):
 def fetch_start_datetime_delta(video_fullname, start_time):
     video_basename = os.path.basename(video_fullname)
 
-    if re.fullmatch(r"pc\d_\d{8}_\d{6}.avi", video_basename) is not None:
+    if re.fullmatch(r"pc\d_\d{8}_\d{6}.(avi|mp4|mkv)", video_basename) is not None:
         video_start_datetime_string = video_basename[4:19]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y%m%d_%H%M%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
         return start_datetime_delta
 
-    if re.fullmatch(r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.avi", video_basename) is not None:
+    if re.fullmatch(r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.(avi|mp4|mkv)", video_basename) is not None:
         video_start_datetime_string = video_basename[13:32]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y-%m-%d_%H.%M.%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
