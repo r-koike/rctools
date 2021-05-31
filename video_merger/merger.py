@@ -167,25 +167,31 @@ def merge(output_basename, video0, video1, video2, video3):
         start_times.append(start_time)
 
     original_videos = []
+    original_audios = []
     for i in range(len(video_basenames)):
         print(start_times[i], min_cutted_duration)
 
+        stream = ffmpeg.input(video_fullnames[i], ss=start_times[i], t=min_cutted_duration)
+        audio = stream.audio
         video = (
-            ffmpeg
-            .input(video_fullnames[i], ss=start_times[i], t=min_cutted_duration)
+            stream
             .filter("scale", 1280, -1)
             .filter("fps", fps=OUTPUT_FPS)
         )
+        original_audios.append(audio)
         original_videos.append(video)
 
     # 動画を保存する
-    # run()はこの中で起こる
+    # run()は最後に呼ばれる
+    # audioはてきとうに0番目の入力からとっている
+    # ? audioの入力はどれをとるのがいいか
     top_video = ffmpeg.filter([original_videos[0], original_videos[1]], "hstack")
     bottom_video = ffmpeg.filter([original_videos[2], original_videos[3]], "hstack")
+    merged_video = ffmpeg.filter([top_video, bottom_video], "vstack")
+    output_fullname = os.path.join(output_dirname, output_basename)
     _ = (
         ffmpeg
-        .filter([top_video, bottom_video], "vstack")
-        .output(os.path.join(output_dirname, output_basename), vcodec="h264_nvenc")
+        .output(merged_video, original_audios[0], output_fullname, vcodec="h264_nvenc")
         .run()
     )
 
