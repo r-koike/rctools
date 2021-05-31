@@ -147,8 +147,7 @@ def make_dicts():
                     f"delta:{start_time_delta}, len: {len(video_basenames)}"
 
 
-# TODO: 動画の上書き可否を変数で指定するようにする
-def merge_videos(output_basename, video0, video1, video2, video3):
+def merge(output_basename, video0, video1, video2, video3):
     video_basenames = [video0, video1, video2, video3]
 
     # 動画終了までの時間が最も短いものに合わせる
@@ -191,7 +190,7 @@ def merge_videos(output_basename, video0, video1, video2, video3):
     )
 
 
-def main():
+def merge_all_videos():
     make_dicts()
 
     for output_basename, video_basenames in video_packet_list:
@@ -203,11 +202,29 @@ def main():
                 pass
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.ignore:
                 continue
-        merge_videos(output_basename, *video_basenames)
+        merge(output_basename, *video_basenames)
 
     with open(ignored_log_fullname, "w") as f:
         json.dump(ignored_videos, f, indent=4)
 
 
+def merge_one_video():
+    output_basename = "Test-Title-6.mp4"
+    video_basenames = [
+        "pc1_20210531_214633.mp4",
+        "pc2_20210531_214630.mp4",
+        "pc3_20210531_214632.mp4",
+        "operation-pc-2021-05-31_21.46.37.mkv"
+    ]
+
+    video_basenames = sort_video_basenames(*video_basenames)
+    output_fullname = os.path.join(output_dirname, output_basename)
+    if os.path.exists(output_fullname):
+        os.remove(output_fullname)
+    make_dicts()
+    merge(output_basename, *video_basenames)
+
+
 if __name__ == "__main__":
-    main()
+    merge_all_videos()
+    # merge_one_video()
