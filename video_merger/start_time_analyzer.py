@@ -20,7 +20,7 @@ target_min_timelength = 0.4
 
 input_dirname = os.path.join(os.path.dirname(__file__), "test")
 audio_dirname = os.path.join(os.path.dirname(__file__), "temp", "audio")
-output_filename = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
+output_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
 
 results = {}
 
@@ -162,7 +162,7 @@ def analyze():
 
     # * ---------------------------------------------------------------------------
     # jsonに保存する
-    with open(output_filename, "w") as f:
+    with open(output_fullname, "w") as f:
         json.dump(results, f, indent=4)
 
 
