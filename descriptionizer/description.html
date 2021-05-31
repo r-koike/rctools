@@ -39,36 +39,74 @@
       <td>Robot: FUHGA 3</td>
     </tr>
     <tr>
-      <td>Config: <input class="contents-font" value="AAA"></input></td>
-      <td>Operator: <input class="contents-font" value="Takemori"></input></td>
+      <td>Config: <input id="config" class="contents-font" value="AAA"></input></td>
+      <td>Operator: <input id="operator" class="contents-font" value="Takemori"></input></td>
     </tr>
     <tr>
-      <td colspan="2">Test: <input class="contents-font"></input></td>
+      <td colspan="2">Test: <input id="test" class="contents-font"></input></td>
     </tr>
     <tr>
-      <td>Trial: <input class="contents-font" value="1"></input></td>
-      <td>Position: <input class="contents-font"></input></td>
+      <td>Position: <input id="position" class="contents-font"></input></td>
+      <td>Trial: <input id="trial" class="contents-font" value="1"></input></td>
     </tr>
   </table>
   <script>
-    let audio = new Audio("1000Hz.wav");
+    const audio = new Audio("1000Hz.wav");
+    setInterval(setCurrentTime, 50);
 
     document.getElementById("start-button").onclick = function () {
       // document.getElementById("start-button").innerHTML = "Clicked";
       audio.play();
       window.setTimeout(stopAudio, 1000);
+
+      const date = new Date();
+      const dateStr = getStringFromDate(date, "YYYYMMDDhhmmss");
+      const configStr = document.getElementById("config").value;
+      const operatorStr = document.getElementById("operator").value;
+      const testStr = document.getElementById("test").value;
+      const positionStr = document.getElementById("position").value;
+      const trialStr = document.getElementById("trial").value;
+
+      let fileName = `${dateStr}-SHINOBI-FUHGA3-${configStr}-${operatorStr}`
+      fileName += `-${testStr}-${positionStr}-${trialStr}.txt`
+
+      const blob = new Blob([fileName], { type: "text/plan" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
     };
+    function getStringFromDate(date, formatStr = "YYYY-MM-DD hh:mm:ss") {
+      const yearStr = date.getFullYear();
+      // 月だけ+1する
+      const monthStr = zeroPadding(1 + date.getMonth(), 2);
+      const dayStr = zeroPadding(date.getDate(), 2);
+      const hourStr = zeroPadding(date.getHours(), 2);
+      const minuteStr = zeroPadding(date.getMinutes(), 2);
+      const secondStr = zeroPadding(date.getSeconds(), 2);
+
+      formatStr = formatStr.replace(/YYYY/g, yearStr);
+      formatStr = formatStr.replace(/MM/g, monthStr);
+      formatStr = formatStr.replace(/DD/g, dayStr);
+      formatStr = formatStr.replace(/hh/g, hourStr);
+      formatStr = formatStr.replace(/mm/g, minuteStr);
+      formatStr = formatStr.replace(/ss/g, secondStr);
+
+      return formatStr;
+    };
+    function zeroPadding(x, len) {
+      return (Array(len).join("0") + x).slice(-len);
+    }
     function stopAudio() {
       audio.pause();
       audio.currentTime = 0;
     };
     function setCurrentTime() {
-      let date = new Date();
-      let dates = date.toString().split(" ");
+      const date = new Date();
+      const dates = date.toString().split(" ");
       document.getElementById("date").innerHTML = `Date: ${dates[0]} ${dates[1]} ${dates[2]} ${dates[3]} (${dates[5]})`;
       document.getElementById("clock").innerHTML = `${dates[4]}`;
     };
-    setInterval(setCurrentTime, 50);
   </script>
 </body>
 

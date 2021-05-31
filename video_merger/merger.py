@@ -28,7 +28,8 @@ video_dirname = os.path.join(os.path.dirname(__file__), "test")
 output_dirname = os.path.join(os.path.dirname(__file__), "output")
 analyzed_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
 manual_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_start_times.json")
-test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "test_datetimes.json")
+test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "created_test_datetimes.json")
+manual_test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_test_datetimes.json")
 ignored_log_fullname = os.path.join(os.path.dirname(__file__), "log", "ignored.json")
 
 video_packet_list = []
@@ -85,14 +86,19 @@ def make_dicts():
         manual_video_start_time_dict = json.load(f)
     with open(test_datetimes_fullname) as f:
         test_datetimes_dict = json.load(f)
+    with open(manual_test_datetimes_fullname) as f:
+        manual_test_datetimes_dict = json.load(f)
 
     # analizedなvideo_start_times_dictをmanualなデータで塗りつぶす
-    for video_name, start_times in manual_video_start_time_dict.items():
-        video_start_time_dict[video_name] = start_times
+    for key, value in manual_video_start_time_dict.items():
+        video_start_time_dict[key] = value
+    # createdなtest_datetimes_dictをmanualなデータで塗りつぶす
+    for key, value in manual_test_datetimes_dict.items():
+        test_datetimes_dict[key] = value
 
     # test_video_listsの要素は，[title, (基準からの経過秒数), [(この時刻に開始されたvideoたち)]]
     test_video_lists = []
-    for title, date_time_string in test_datetimes_dict.items():
+    for date_time_string, title in test_datetimes_dict.items():
         date_time = datetime.datetime.strptime(date_time_string, "%Y-%m-%d %H:%M:%S")
         date_time_delta = (date_time - BASE_DATETIME).total_seconds()
         test_video_lists.append([title, date_time_delta, []])
