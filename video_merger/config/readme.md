@@ -16,3 +16,11 @@
 }
 ```
 
+### `manual_config.json`
+
+```
+{
+	"vcodec": "libx264"
+}
+```
+

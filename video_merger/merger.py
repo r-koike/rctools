@@ -30,6 +30,7 @@ analyzed_start_times_fullname = os.path.join(os.path.dirname(__file__), "config"
 manual_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_start_times.json")
 test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "created_test_datetimes.json")
 manual_test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_test_datetimes.json")
+manual_config_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_config.json")
 ignored_log_fullname = os.path.join(os.path.dirname(__file__), "log", "ignored_by_merger.json")
 
 video_packet_list = []
@@ -156,6 +157,12 @@ def make_dicts():
 def merge(output_basename, video0, video1, video2, video3):
     video_basenames = [video0, video1, video2, video3]
 
+    # 設定ファイルがあればそれを読みに行く
+    configs = {}
+    if os.path.exists(manual_config_fullname):
+        with open(manual_config_fullname) as f:
+            configs = json.load(f)
+
     # 動画終了までの時間が最も短いものに合わせる
     min_cutted_duration = 9999999999999999.0
     video_fullnames = []
@@ -187,6 +194,12 @@ def merge(output_basename, video0, video1, video2, video3):
         original_audios.append(audio)
         original_videos.append(video)
 
+    # コーデックを指定する
+    # "libx264"->GPU無くてもOK，"h264_nvenc"->cudaアクセラレーション
+    vcodec = "libx264"
+    if "vcodec" in configs:
+        vcodec = configs["vcodec"]
+
     # 動画を保存する
     # run()は最後に呼ばれる
     # audioはてきとうに0番目の入力からとっている
@@ -197,7 +210,7 @@ def merge(output_basename, video0, video1, video2, video3):
     output_fullname = os.path.join(output_dirname, output_basename)
     _ = (
         ffmpeg
-        .output(merged_video, original_audios[0], output_fullname, vcodec="h264_nvenc")
+        .output(merged_video, original_audios[0], output_fullname, vcodec=vcodec)
         .run()
     )
 
