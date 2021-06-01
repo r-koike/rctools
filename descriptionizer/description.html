@@ -55,10 +55,6 @@
     setInterval(setCurrentTime, 50);
 
     document.getElementById("start-button").onclick = function () {
-      // document.getElementById("start-button").innerHTML = "Clicked";
-      audio.play();
-      window.setTimeout(stopAudio, 1000);
-
       const date = new Date();
       const dateStr = getStringFromDate(date, "YYYYMMDDhhmmss");
       const configStr = document.getElementById("config").value;
@@ -66,6 +62,15 @@
       const testStr = document.getElementById("test").value;
       const positionStr = document.getElementById("position").value;
       const trialStr = document.getElementById("trial").value;
+
+      if (configStr == "" || operatorStr == "" || testStr == "" || positionStr == "" || trialStr == "") {
+        alert("空白の欄があります");
+        return;
+      }
+
+      // document.getElementById("start-button").innerHTML = "Clicked";
+      audio.play();
+      window.setTimeout(stopAudio, 1000);
 
       let fileName = `${dateStr}-SHINOBI-FUHGA3-${configStr}-${operatorStr}`
       fileName += `-${testStr}-${positionStr}-${trialStr}.txt`

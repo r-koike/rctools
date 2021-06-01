@@ -1,5 +1,10 @@
 # メモ帳
 
+## TODO
+- 最初にタイトル文字を画面に出す
+- アスペクト比が違う動画を結合できるようにする
+- 
+
 ## requirements
 - ffmpeg
 - ffmpeg-python
