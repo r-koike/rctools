@@ -75,7 +75,7 @@
       let fileName = `${dateStr}-SHINOBI-FUHGA3-${configStr}-${operatorStr}`
       fileName += `-${testStr}-${positionStr}-${trialStr}.txt`
 
-      const blob = new Blob([fileName], { type: "text/plan" });
+      const blob = new Blob(["success"], { type: "text/plan" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = fileName;

@@ -30,7 +30,7 @@ analyzed_start_times_fullname = os.path.join(os.path.dirname(__file__), "config"
 manual_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_start_times.json")
 test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "created_test_datetimes.json")
 manual_test_datetimes_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_test_datetimes.json")
-ignored_log_fullname = os.path.join(os.path.dirname(__file__), "log", "ignored.json")
+ignored_log_fullname = os.path.join(os.path.dirname(__file__), "log", "ignored_by_merger.json")
 
 video_packet_list = []
 video_start_times = {}
