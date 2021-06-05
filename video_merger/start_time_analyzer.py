@@ -23,6 +23,8 @@ audio_dirname = os.path.join(os.path.dirname(__file__), "temp", "audio")
 output_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
 
 results = {}
+with open(output_fullname) as f:
+    results = json.load(f)
 
 
 def extract_audios():
@@ -41,6 +43,12 @@ def extract_audios():
 def analyze():
     audio_fullnames = glob.glob(os.path.join(audio_dirname, "*"))
     for audio_fullname in audio_fullnames:
+        audio_basename = os.path.basename(audio_fullname)
+        video_basename = os.path.splitext(audio_basename)[0]
+        # 既に解析済みだったら無視する
+        if video_basename in results:
+            continue
+
         wave_file = wave.open(audio_fullname, "r")
 
         # [num_frames]はオーディオの時間軸方向にいくつのフレームがあるかを表す
@@ -150,8 +158,6 @@ def analyze():
 
         # * ---------------------------------------------------------------------------
         # dictに保存する
-        audio_basename = os.path.basename(audio_fullname)
-        video_basename = os.path.splitext(audio_basename)[0]
         results[video_basename] = detected_times.tolist()
 
         # print(detected_frames)

@@ -51,13 +51,13 @@ def sort_video_basenames(v0, v1, v2, v3):
 def fetch_start_datetime_delta(video_fullname, start_time):
     video_basename = os.path.basename(video_fullname)
 
-    if re.fullmatch(r"pc\d_\d{8}_\d{6}.(avi|mp4|mkv)", video_basename) is not None:
+    if re.fullmatch(r"pc\d_\d{8}_\d{6}.(avi|mp4|mkv|wmv)", video_basename) is not None:
         video_start_datetime_string = video_basename[4:19]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y%m%d_%H%M%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
         return start_datetime_delta
 
-    if re.fullmatch(r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.(avi|mp4|mkv)", video_basename) is not None:
+    if re.fullmatch(r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.(avi|mp4|mkv|wmv)", video_basename) is not None:
         video_start_datetime_string = video_basename[13:32]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y-%m-%d_%H.%M.%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
@@ -167,10 +167,12 @@ def merge(output_basename, video0, video1, video2, video3):
     min_cutted_duration = 9999999999999999.0
     video_fullnames = []
     start_times = []
+    video_shapes = []
     for video_basename in video_basenames:
         video_fullname = os.path.join(video_dirname, video_basename)
         video_info = ffmpeg.probe(video_fullname)
         duration = float(video_info["format"]["duration"])
+        video_shapes.append((video_info["streams"][0]["width"], video_info["streams"][0]["height"]))
 
         start_time = video_start_times[video_basename]
         cutted_duration = duration - start_time
@@ -186,9 +188,30 @@ def merge(output_basename, video0, video1, video2, video3):
 
         stream = ffmpeg.input(video_fullnames[i], ss=start_times[i], t=min_cutted_duration)
         audio = stream.audio
+        original_width, original_height = video_shapes[i]
+
+        # width:height = 16:9 になるようにcropする
+        # TODO: 別のアスペクト比に対応する
+        if original_width * 9 > original_height * 16:
+            # 横長の画像
+            ow, oh = original_width, original_height
+            h = oh
+            w = (h * 16) // 9
+            x = (ow - w) // 2
+            y = 0
+            stream = ffmpeg.crop(stream, x, y, w, h)
+        elif original_width * 9 < original_height * 16:
+            # 縦長の画像
+            ow, oh = original_width, original_height
+            w = ow
+            h = (w * 9) // 16
+            x = 0
+            y = (oh - h) // 2
+            stream = ffmpeg.crop(stream, x, y, w, h)
+
         video = (
             stream
-            .filter("scale", 1280, -1)
+            .filter("scale", 1280, 720)
             .filter("fps", fps=OUTPUT_FPS)
         )
         original_audios.append(audio)

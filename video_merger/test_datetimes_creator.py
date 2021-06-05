@@ -1,3 +1,6 @@
+# descriptionのテキストファイルを読み込み，いつ何のタスクをやったかのjsonファイル
+# "created_test_datetimes.json"を作る
+
 import os
 import glob
 import datetime
