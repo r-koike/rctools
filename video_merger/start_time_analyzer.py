@@ -18,9 +18,12 @@ target_frequency = 1000
 # 目的周波数の音がこれよりも長い場合に，それは目的音声であると判断する(秒単位)
 target_min_timelength = 0.4
 
-input_dirname = os.path.join(os.path.dirname(__file__), "test")
+input_dirname = os.path.join(os.path.dirname(__file__), "input")
 audio_dirname = os.path.join(os.path.dirname(__file__), "temp", "audio")
 output_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
+extract_log_fullname = os.path.join(os.path.dirname(__file__), "log", "error_in_st_analyzer.json")
+
+error_in_extracting = {}
 
 results = {}
 with open(output_fullname) as f:
@@ -30,6 +33,9 @@ with open(output_fullname) as f:
 def extract_audios():
     input_video_fullnames = glob.glob(os.path.join(input_dirname, "*"))
     for input_video_fullname in input_video_fullnames:
+        if not os.path.isfile(input_video_fullname):
+            continue
+
         # 例えば[1000Hz_test.mp4.wav]のような二重拡張子がついた名前になるが，誤植ではない
         audio_basename = os.path.basename(input_video_fullname)+".wav"
         audio_fullname = os.path.join(audio_dirname, audio_basename)
@@ -37,7 +43,11 @@ def extract_audios():
             try:
                 ffmpeg.input(input_video_fullname).output(audio_fullname, format="wav").run()
             except ffmpeg._run.Error:
+                error_in_extracting[audio_basename] = "extracting video->wav error"
                 results[os.path.basename(input_video_fullname)] = []
+
+    with open(extract_log_fullname, "w") as f:
+        json.dump(error_in_extracting, f, indent=4)
 
 
 def analyze():

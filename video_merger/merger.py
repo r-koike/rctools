@@ -10,7 +10,9 @@ import enum
 
 class OverrideConfig(enum.Enum):
     # each: 各ファイルで選択する(その都度プログラムが止まる)
+    # series: (1),(2),...という名前付けで処理される
     override = enum.auto()
+    series = enum.auto()
     each = enum.auto()
     ignore = enum.auto()
 
@@ -21,10 +23,10 @@ BASE_DATETIME = datetime.datetime(2021, 1, 1, hour=0, minute=0, second=0)
 # 開始時刻がこの秒数以上[test_datetimes.json]の設定とズレている動画はignoreする
 SAME_TEST_MERGIN = 15.0
 
-OVERRIDE_OUTPUT_VIDEO = OverrideConfig.override
+OVERRIDE_OUTPUT_VIDEO = OverrideConfig.series
 
 
-video_dirname = os.path.join(os.path.dirname(__file__), "test")
+video_dirname = os.path.join(os.path.dirname(__file__), "input")
 output_dirname = os.path.join(os.path.dirname(__file__), "output")
 analyzed_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "analyzed_start_times.json")
 manual_start_times_fullname = os.path.join(os.path.dirname(__file__), "config", "manual_start_times.json")
@@ -246,10 +248,35 @@ def merge_all_videos():
         if os.path.exists(output_fullname):
             if OVERRIDE_OUTPUT_VIDEO == OverrideConfig.override:
                 os.remove(output_fullname)
+            elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.series:
+                basename_without_extension = os.path.splitext(output_basename)[0]
+                # 今は(4)までサポートしている
+                # TODO: 正規表現の最後尾一致で数字をとる
+                if re.fullmatch(r".+(1)", basename_without_extension) is not None:
+                    basename_without_extension = basename_without_extension + "(2)"
+                elif re.fullmatch(r".+(2)", basename_without_extension) is not None:
+                    basename_without_extension = basename_without_extension + "(3)"
+                elif re.fullmatch(r".+(3)", basename_without_extension) is not None:
+                    basename_without_extension = basename_without_extension + "(4)"
+                elif re.fullmatch(r".+(4)", basename_without_extension) is not None:
+                    basename_without_extension = basename_without_extension + "(5)"
+                else:
+                    basename_without_extension = basename_without_extension + "(1)"
+                output_basename = basename_without_extension + ".mp4"
+
+                # if re.fullmatch(r".+(\d+?)", basename_without_extension) is None:
+                #     basename_without_extension = basename_without_extension + "(1)"
+                # else:
+                #     pass
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.each:
                 pass
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.ignore:
                 continue
+
+        # スペースをアンダーバーに
+        output_basename = output_basename.replace(" ", "_")
+        print("-----------------------------")
+        print(output_basename, video_basenames)
         merge(output_basename, *video_basenames)
 
     with open(ignored_log_fullname, "w") as f:
