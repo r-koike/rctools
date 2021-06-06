@@ -244,37 +244,31 @@ def merge_all_videos():
     make_dicts()
 
     for output_basename, video_basenames in video_packet_list:
+        # スペースをアンダーバーに
+        output_basename = output_basename.replace(" ", "_")
         output_fullname = os.path.join(output_dirname, output_basename)
         if os.path.exists(output_fullname):
             if OVERRIDE_OUTPUT_VIDEO == OverrideConfig.override:
                 os.remove(output_fullname)
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.series:
                 basename_without_extension = os.path.splitext(output_basename)[0]
-                # 今は(4)までサポートしている
-                # TODO: 正規表現の最後尾一致で数字をとる
-                if re.fullmatch(r".+(1)", basename_without_extension) is not None:
-                    basename_without_extension = basename_without_extension + "(2)"
-                elif re.fullmatch(r".+(2)", basename_without_extension) is not None:
-                    basename_without_extension = basename_without_extension + "(3)"
-                elif re.fullmatch(r".+(3)", basename_without_extension) is not None:
-                    basename_without_extension = basename_without_extension + "(4)"
-                elif re.fullmatch(r".+(4)", basename_without_extension) is not None:
-                    basename_without_extension = basename_without_extension + "(5)"
-                else:
-                    basename_without_extension = basename_without_extension + "(1)"
-                output_basename = basename_without_extension + ".mp4"
-
-                # if re.fullmatch(r".+(\d+?)", basename_without_extension) is None:
-                #     basename_without_extension = basename_without_extension + "(1)"
-                # else:
-                #     pass
+                while os.path.exists(output_fullname):
+                    # 今は(100)まで作れる
+                    if re.fullmatch(r".+\(\d\)", basename_without_extension) is not None:
+                        current_number = int(basename_without_extension[-2])
+                        basename_without_extension = f"basename_without_extension({current_number+1})"
+                    if re.fullmatch(r".+\(\d{2}\)", basename_without_extension) is not None:
+                        current_number = int(basename_without_extension[-3:-1])
+                        basename_without_extension = f"basename_without_extension({current_number+1})"
+                    else:
+                        basename_without_extension = basename_without_extension + "(1)"
+                    output_basename = basename_without_extension + ".mp4"
+                    output_fullname = os.path.join(output_dirname, output_basename)
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.each:
                 pass
             elif OVERRIDE_OUTPUT_VIDEO == OverrideConfig.ignore:
                 continue
 
-        # スペースをアンダーバーに
-        output_basename = output_basename.replace(" ", "_")
         print("-----------------------------")
         print(output_basename, video_basenames)
         merge(output_basename, *video_basenames)
