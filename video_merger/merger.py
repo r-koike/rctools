@@ -23,7 +23,7 @@ BASE_DATETIME = datetime.datetime(2021, 1, 1, hour=0, minute=0, second=0)
 # 開始時刻がこの秒数以上[test_datetimes.json]の設定とズレている動画はignoreする
 SAME_TEST_MERGIN = 15.0
 
-OVERRIDE_OUTPUT_VIDEO = OverrideConfig.ignore
+OVERRIDE_OUTPUT_VIDEO = OverrideConfig.series
 
 
 video_dirname = os.path.join(os.path.dirname(__file__), "input")

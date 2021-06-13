@@ -11,12 +11,12 @@ from scipy import signal
 # Hz単位で，これ以降の周波数判定に使う周波数範囲，及び目的音声の周波数を指定する
 # 700Hzよりも低周波数の場所は人の声などでnoisyなので非推奨
 # [target_frequency]の整数倍の値は範囲に含めないべき
-# lower_limit_frequency = 700
-# upper_limit_frequency = 1900
-# target_frequency = 1000
-lower_limit_frequency = 3700
-upper_limit_frequency = 4900
-target_frequency = 4000
+lower_limit_frequency = 700
+upper_limit_frequency = 1900
+target_frequency = 1000
+# lower_limit_frequency = 3700
+# upper_limit_frequency = 4900
+# target_frequency = 4000
 
 # 目的周波数の音がこれよりも長い場合に，それは目的音声であると判断する(秒単位)
 target_min_timelength = 0.65
