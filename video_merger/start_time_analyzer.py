@@ -11,12 +11,15 @@ from scipy import signal
 # Hz単位で，これ以降の周波数判定に使う周波数範囲，及び目的音声の周波数を指定する
 # 700Hzよりも低周波数の場所は人の声などでnoisyなので非推奨
 # [target_frequency]の整数倍の値は範囲に含めないべき
-lower_limit_frequency = 700
-upper_limit_frequency = 1900
-target_frequency = 1000
+# lower_limit_frequency = 700
+# upper_limit_frequency = 1900
+# target_frequency = 1000
+lower_limit_frequency = 3700
+upper_limit_frequency = 4900
+target_frequency = 4000
 
 # 目的周波数の音がこれよりも長い場合に，それは目的音声であると判断する(秒単位)
-target_min_timelength = 0.4
+target_min_timelength = 0.65
 
 input_dirname = os.path.join(os.path.dirname(__file__), "input")
 audio_dirname = os.path.join(os.path.dirname(__file__), "temp", "audio")
@@ -59,6 +62,7 @@ def analyze():
         if video_basename in results:
             continue
 
+        # print(f"analyzing {video_basename}")
         wave_file = wave.open(audio_fullname, "r")
 
         # [num_frames]はオーディオの時間軸方向にいくつのフレームがあるかを表す
@@ -83,6 +87,10 @@ def analyze():
         # https://jp.mathworks.com/help/signal/ug/spectrogram-computation-in-signal-analyzer.html
         n_per_segment = 1024
         n_fft = frame_rate / 10
+        if n_per_segment > n_fft:
+            n_fft = frame_rate / 5
+        if n_per_segment > n_fft:
+            n_fft = frame_rate / 2
         slide_time_step = 100
         frequencies, times, Sxx = signal.spectrogram(
             y,
@@ -171,15 +179,15 @@ def analyze():
         results[video_basename] = detected_times.tolist()
 
         # print(detected_frames)
-        print(f"{video_basename}: {detected_times}")
+        print(f"\"{video_basename}\": {detected_times}")
 
         # plt.plot(times, detecting_target)
         # plt.show()
 
-    # * ---------------------------------------------------------------------------
-    # jsonに保存する
-    with open(output_fullname, "w") as f:
-        json.dump(results, f, indent=4)
+        # * ---------------------------------------------------------------------------
+        # jsonに保存する
+        with open(output_fullname, "w") as f:
+            json.dump(results, f, sort_keys=True, indent=4)
 
 
 if __name__ == "__main__":

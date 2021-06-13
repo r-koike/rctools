@@ -23,7 +23,7 @@ BASE_DATETIME = datetime.datetime(2021, 1, 1, hour=0, minute=0, second=0)
 # 開始時刻がこの秒数以上[test_datetimes.json]の設定とズレている動画はignoreする
 SAME_TEST_MERGIN = 15.0
 
-OVERRIDE_OUTPUT_VIDEO = OverrideConfig.series
+OVERRIDE_OUTPUT_VIDEO = OverrideConfig.ignore
 
 
 video_dirname = os.path.join(os.path.dirname(__file__), "input")
@@ -53,13 +53,19 @@ def sort_video_basenames(v0, v1, v2, v3):
 def fetch_start_datetime_delta(video_fullname, start_time):
     video_basename = os.path.basename(video_fullname)
 
-    if re.fullmatch(r"pc\d_\d{8}_\d{6}.(avi|mp4|mkv|wmv)", video_basename) is not None:
+    if re.fullmatch(
+            r"pc\d_\d{8}_\d{6}.(avi|mp4|mkv|wmv|mov)",
+            video_basename
+    ) is not None:
         video_start_datetime_string = video_basename[4:19]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y%m%d_%H%M%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
         return start_datetime_delta
 
-    if re.fullmatch(r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.(avi|mp4|mkv|wmv)", video_basename) is not None:
+    if re.fullmatch(
+        r"operation-pc-\d{4}-\d{2}-\d{2}_\d{2}.\d{2}.\d{2}.(avi|mp4|mkv|wmv|mov)",
+        video_basename
+    ) is not None:
         video_start_datetime_string = video_basename[13:32]
         video_start_datetime = datetime.datetime.strptime(video_start_datetime_string, "%Y-%m-%d_%H.%M.%S")
         start_datetime_delta = (video_start_datetime - BASE_DATETIME).total_seconds() + start_time
@@ -256,10 +262,10 @@ def merge_all_videos():
                     # 今は(100)まで作れる
                     if re.fullmatch(r".+\(\d\)", basename_without_extension) is not None:
                         current_number = int(basename_without_extension[-2])
-                        basename_without_extension = f"basename_without_extension({current_number+1})"
-                    if re.fullmatch(r".+\(\d{2}\)", basename_without_extension) is not None:
+                        basename_without_extension = f"{basename_without_extension}({current_number+1})"
+                    elif re.fullmatch(r".+\(\d{2}\)", basename_without_extension) is not None:
                         current_number = int(basename_without_extension[-3:-1])
-                        basename_without_extension = f"basename_without_extension({current_number+1})"
+                        basename_without_extension = f"{basename_without_extension}({current_number+1})"
                     else:
                         basename_without_extension = basename_without_extension + "(1)"
                     output_basename = basename_without_extension + ".mp4"
